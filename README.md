@@ -10,7 +10,7 @@ It demonstrates how to grab a point cloud with the ZED SDK and link the results 
 The color point cloud is converted and then displayed using PCLVisualizer. The 'grab' function of the ZED SDK in charge of the disparity map computation and 3D projection run in a thread.                                
 ##Build the program
 
-Open a terminal in 'with PCL' directory and execute the following command:
+Open a terminal in 'zed-pcl' directory and execute the following command:
 
     $ mkdir build
     $ cd build
