@@ -6,6 +6,7 @@ It demonstrates how to grab a point cloud with the ZED SDK and link the results 
 
 **Warning:**
  - This sample is not designed to operate in real time
+ - This sample requires PCL with the module visualization (sometimes disable by default if built from sources)
      
 The color point cloud is converted and then displayed using PCLVisualizer. The 'grab' function of the ZED SDK in charge of the disparity map computation and 3D projection run in a thread.                                
 ##Build the program
