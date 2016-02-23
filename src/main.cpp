@@ -39,6 +39,11 @@
 #include <zed/Camera.hpp>
 #include <zed/utils/GlobalDefine.hpp>
 
+#ifdef _WIN32
+#undef max
+#undef min
+#endif
+
 // PCL includes
 #include <pcl/common/common_headers.h>
 #include <pcl/visualization/pcl_visualizer.h>
