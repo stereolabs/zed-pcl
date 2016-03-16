@@ -72,15 +72,15 @@ void grab_run() {
     float* p_cloud;
 
     while (!stop_signal) {
-        zed->grab(dm_type);
+        if (!zed->grab(dm_type)) {
 
-        p_cloud = (float*) zed->retrieveMeasure(MEASURE::XYZRGBA).data; // Get the pointer
+            p_cloud = (float*) zed->retrieveMeasure(MEASURE::XYZRGBA).data; // Get the pointer
 
-        // Fill the buffer
-        buffer->mutex_input.lock(); // To prevent from data corruption
-        memcpy(buffer->data_cloud, p_cloud, buffer->width * buffer->height * sizeof (float) * 4);
-        buffer->mutex_input.unlock();
-
+            // Fill the buffer
+            buffer->mutex_input.lock(); // To prevent from data corruption
+            memcpy(buffer->data_cloud, p_cloud, buffer->width * buffer->height * sizeof (float) * 4);
+            buffer->mutex_input.unlock();
+        }
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 }
@@ -139,39 +139,40 @@ int main(int argc, char** argv) {
     float color;
     int index4 = 0;
 
+    point_cloud_ptr->points.resize(size);
+
     while (!viewer->wasStopped()) {
 
-        point_cloud_ptr->points.clear();
+        if (buffer->mutex_input.try_lock()) {
+            data_cloud = buffer->data_cloud;
+            index4 = 0;
 
-        buffer->mutex_input.try_lock();
-        data_cloud = buffer->data_cloud;
-        index4 = 0;
+            for (auto &it : point_cloud_ptr->points) {
+                // Changing unit and coordinate for better visualization
+                it.x = -data_cloud[index4++]*0.001;
+                it.y = -data_cloud[index4++]*0.001;
+                it.z = data_cloud[index4++]*0.001;
 
-        for (int i = 0; i < size; i++) {
-            pcl::PointXYZRGB point;
+                if (it.z < 0) { // Checking if it's a valid point
+                    it.x = it.y = it.z = it.rgb = 0;
+                    index4++;
+                    continue;
+                }
 
-            // Changing unit and coordinate for better visualization
-            point.x = -data_cloud[index4++]*0.001;
-            point.y = -data_cloud[index4++]*0.001;
-            point.z = data_cloud[index4++]*0.001;
+                color = data_cloud[index4++];
+                // Converting color
+                uint32_t color_uint = *(uint32_t*) & color;
+                unsigned char* color_uchar = (unsigned char*) &color_uint;
+                color_uint = ((uint32_t) color_uchar[0] << 16 | (uint32_t) color_uchar[1] << 8 | (uint32_t) color_uchar[2]);
+                it.rgb = *reinterpret_cast<float*> (&color_uint);
+            }
 
-            color = data_cloud[index4++];
-            // Converting color
-            uint32_t color_uint = *(uint32_t*) & color;
-            unsigned char* color_uchar = (unsigned char*) &color_uint;
-            color_uint = ((uint32_t) color_uchar[0] << 16 | (uint32_t) color_uchar[1] << 8 | (uint32_t) color_uchar[2]);
-            point.rgb = *reinterpret_cast<float*> (&color_uint);
+            buffer->mutex_input.unlock();
 
-            if (point.z > 0) // Checking if it's a valid point
-                point_cloud_ptr->points.push_back(point);
+            viewer->updatePointCloud(point_cloud_ptr);
+            viewer->spinOnce(15);
         }
-
-        buffer->mutex_input.unlock();
-
-        viewer->updatePointCloud(point_cloud_ptr);
-        viewer->spinOnce(20);
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 
     // Stop the grabbing thread
@@ -182,5 +183,4 @@ int main(int argc, char** argv) {
     delete buffer;
     delete zed;
     return 0;
-
 }
