@@ -63,7 +63,7 @@ typedef struct image_bufferStruct {
 
 Camera* zed;
 image_buffer* buffer;
-SENSING_MODE dm_type = RAW;
+SENSING_MODE dm_type = STANDARD;
 bool stop_signal;
 
 // Grabbing function
@@ -113,7 +113,11 @@ int main(int argc, char** argv) {
     int width = zed->getImageSize().width;
     int height = zed->getImageSize().height;
 
-    ERRCODE err = zed->init(MODE::PERFORMANCE, -1, true);
+    sl::zed::InitParams params;
+    params.mode = PERFORMANCE;
+    params.verbose = true;
+
+    ERRCODE err = zed->init(params);
     cout << errcode2str(err) << endl;
     if (err != SUCCESS) {
         delete zed;
