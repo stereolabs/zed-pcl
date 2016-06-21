@@ -14,7 +14,7 @@ IF(WIN32) # Windows
     SET(ZED_LIBRARIES $ENV{ZED_LIBRARIES_64})
     SET(ZED_LIBRARY_DIR $ENV{ZED_LIBRARY_DIR})
     SET(OPENCV_DIR $ENV{OPENCV_DIR})
-    SET(Eigen_INCLUDE_DIRS $ENV{EIGEN_DIR})
+    SET(EIGEN3_INCLUDE_DIR $ENV{EIGEN_DIR})
 ELSE() # Linux
     find_package(ZED 1.0 REQUIRED)
     find_package(Eigen3 REQUIRED)
@@ -35,6 +35,7 @@ include_directories(${CUDA_INCLUDE_DIRS})
 include_directories(${PCL_INCLUDE_DIRS})
 include_directories(${ZED_INCLUDE_DIRS})
 include_directories(${OpenCV_INCLUDE_DIRS})
+include_directories(${EIGEN3_INCLUDE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 link_directories(${ZED_LIBRARY_DIR})
