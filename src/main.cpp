@@ -95,14 +95,6 @@ std::shared_ptr<pcl::visualization::PCLVisualizer> rgbVis(pcl::PointCloud<pcl::P
     return (viewer);
 }
 
-inline void cvtColor(float color0, uchar &r_, uchar &g_, uchar &b_) {
-	unsigned char * ptr_im;
-	ptr_im = (unsigned char *)&color0;
-	r_ = ptr_im[0];
-	g_ = ptr_im[1];
-	b_ = ptr_im[2];
-}
-
 int main(int argc, char** argv) {
     stop_signal = false;
 
