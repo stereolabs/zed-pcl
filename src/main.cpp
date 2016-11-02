@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////
 //
-// Copyright (c) 2015, STEREOLABS.
+// Copyright (c) 2016, STEREOLABS.
 //
 // All rights reserved.
 //
@@ -23,8 +23,6 @@
  ** This sample demonstrates how to use PCL (Point Cloud Library) with the ZED SDK **
  ************************************************************************************/
 
-
-// standard includes
 #include <stdio.h>
 #include <string.h>
 #include <ctime>
@@ -32,10 +30,8 @@
 #include <thread>
 #include <mutex>
 
-// OpenCV includes
 #include <opencv2/opencv.hpp>
 
-// ZED includes
 #include <zed/Camera.hpp>
 #include <zed/utils/GlobalDefine.hpp>
 
@@ -44,15 +40,11 @@
 #undef min
 #endif
 
-// PCL includes
 #include <pcl/common/common_headers.h>
 #include <pcl/visualization/pcl_visualizer.h>
 
 using namespace sl::zed;
 using namespace std;
-
-
-// Exchange structure
 
 typedef struct image_bufferStruct {
     float* data_cloud;
@@ -66,7 +58,7 @@ image_buffer* buffer;
 SENSING_MODE dm_type = STANDARD;
 bool stop_signal;
 
-// Grabbing function
+// Grab called in a thread to parallelize the rendering and the computation
 
 void grab_run() {
     float* p_cloud;
@@ -76,8 +68,8 @@ void grab_run() {
             p_cloud = (float*) zed->retrieveMeasure(MEASURE::XYZRGBA).data; // Get the pointer
             // Fill the buffer
             buffer->mutex_input.lock(); // To prevent from data corruption
-            memcpy(buffer->data_cloud, p_cloud, buffer->width * buffer->height * sizeof (float) * 4);			
-			buffer->mutex_input.unlock();
+            memcpy(buffer->data_cloud, p_cloud, buffer->width * buffer->height * sizeof (float) * 4);
+            buffer->mutex_input.unlock();
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
@@ -91,7 +83,7 @@ std::shared_ptr<pcl::visualization::PCLVisualizer> rgbVis(pcl::PointCloud<pcl::P
     viewer->addPointCloud<pcl::PointXYZRGB> (cloud, rgb);
     viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1.5);
     viewer->addCoordinateSystem(1.0);
-	viewer->initCameraParameters();
+    viewer->initCameraParameters();
     return (viewer);
 }
 
@@ -103,15 +95,15 @@ int main(int argc, char** argv) {
         return -1;
     }
 
-    if (argc == 1) // Use in Live Mode
+    if (argc == 1) // Live Mode
         zed = new Camera(HD720);
-    else // Use in SVO playback mode
+    else // SVO playback mode
         zed = new Camera(argv[1]);
-	
+
     sl::zed::InitParams params;
     params.mode = PERFORMANCE;
-	params.unit = METER;										// scale to fit openGL world
-	params.coordinate = RIGHT_HANDED;		// openGL compatible
+    params.unit = METER; // Scale to fit OpenGL world
+    params.coordinate = RIGHT_HANDED; // OpenGL compatible
     params.verbose = true;
 
     ERRCODE err = zed->init(params);
@@ -121,10 +113,10 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-	int width = zed->getImageSize().width;
-	int height = zed->getImageSize().height;
-	
-    // allocate data
+    int width = zed->getImageSize().width;
+    int height = zed->getImageSize().height;
+
+    // Allocate data
     buffer = new image_buffer();
     buffer->height = height;
     buffer->width = width;
@@ -140,7 +132,7 @@ int main(int argc, char** argv) {
     std::thread grab_thread(grab_run);
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-	float color;
+    float color;
     int index4 = 0;
 
     point_cloud_ptr->points.resize(size);
@@ -151,21 +143,22 @@ int main(int argc, char** argv) {
             data_cloud = buffer->data_cloud;
             index4 = 0;
 
-            for (auto &it : point_cloud_ptr->points){
-				float X = data_cloud[index4*4];
-				if (!isValidMeasure(X)) // Checking if it's a valid point
+            for (auto &it : point_cloud_ptr->points) {
+                float X = data_cloud[index4 * 4];
+                if (!isValidMeasure(X)) // Checking if it's a valid point
                     it.x = it.y = it.z = it.rgb = 0;
-				else{
-					it.x =X;
-					it.y = data_cloud[index4 * 4 + 1];
-					it.z = data_cloud[index4 * 4 + 2];
-					color = data_cloud[index4 * 4 + 3];
-					uint32_t color_uint = *(uint32_t*)& color;
-					unsigned char* color_uchar = (unsigned char*)&color_uint;
-					color_uint = ((uint32_t)color_uchar[0] << 16 | (uint32_t)color_uchar[1] << 8 | (uint32_t)color_uchar[2]);
-					it.rgb = *reinterpret_cast<float*> (&color_uint);
-				}
-				index4++;
+                else {
+                    it.x = X;
+                    it.y = data_cloud[index4 * 4 + 1];
+                    it.z = data_cloud[index4 * 4 + 2];
+                    color = data_cloud[index4 * 4 + 3];
+                    // Color conversion (RGBA as float32 -> RGB as uint32)
+                    uint32_t color_uint = *(uint32_t*) & color;
+                    unsigned char* color_uchar = (unsigned char*) &color_uint;
+                    color_uint = ((uint32_t) color_uchar[0] << 16 | (uint32_t) color_uchar[1] << 8 | (uint32_t) color_uchar[2]);
+                    it.rgb = *reinterpret_cast<float*> (&color_uint);
+                }
+                index4++;
             }
             buffer->mutex_input.unlock();
             viewer->updatePointCloud(point_cloud_ptr);

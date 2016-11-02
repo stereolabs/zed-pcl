@@ -49,7 +49,7 @@ FILE(GLOB_RECURSE SRC_FILES "${SRC_FOLDER}/*.cpp")
 ADD_EXECUTABLE(${execName} ${SRC_FILES})
 set_property(TARGET ${execName} PROPERTY OUTPUT_NAME "ZED with PCL")
 
-add_definitions(-std=c++0x) # -m64)
+add_definitions(-std=c++0x -g -O3) # -m64)
 
 TARGET_LINK_LIBRARIES(${execName}
                         ${ZED_LIBRARIES}
@@ -57,5 +57,3 @@ TARGET_LINK_LIBRARIES(${execName}
                         ${PCL_LIBRARIES}
                         ${CUDA_LIBRARIES} ${CUDA_npps_LIBRARY} ${CUDA_nppi_LIBRARY}
                     )
-
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O3" ) # Release Perf mode 
