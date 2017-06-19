@@ -90,9 +90,6 @@ int main(int argc, char** argv) {
 
     // Create the PCL point cloud visualizer
     shared_ptr<pcl::visualization::PCLVisualizer> viewer = createRGBVisualizer(p_pcl_point_cloud);
-    viewer->addCoordinateSystem(1.0);
-    viewer->initCameraParameters();
-    viewer->setCameraPosition(0.140176, -0.188087, -3.58694, -0.0165125, -0.999615, 0.0222822);
 
     // Start ZED callback
     startZED();
@@ -187,6 +184,7 @@ shared_ptr<pcl::visualization::PCLVisualizer> createRGBVisualizer(pcl::PointClou
     viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1.5);
     viewer->addCoordinateSystem(1.0);
     viewer->initCameraParameters();
+    viewer->setCameraPosition(0.140176, -0.188087, -3.58694, -0.0165125, -0.999615, 0.0222822);
     return (viewer);
 }
 
