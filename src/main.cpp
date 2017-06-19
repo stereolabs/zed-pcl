@@ -72,7 +72,6 @@ int main(int argc, char** argv) {
     init_params.camera_resolution = RESOLUTION_HD720;
     if (argc == 2) init_params.svo_input_filename = argv[1];
     init_params.coordinate_units = UNIT_METER;
-    init_params.coordinate_system = COORDINATE_SYSTEM_RIGHT_HANDED_Y_UP;
     init_params.depth_mode = DEPTH_MODE_PERFORMANCE;
     init_params.camera_fps = 30;
 
@@ -86,9 +85,14 @@ int main(int argc, char** argv) {
     // Allocate PCL point cloud at the resolution
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr p_pcl_point_cloud(new pcl::PointCloud<pcl::PointXYZRGB>);
     p_pcl_point_cloud->points.resize(zed.getResolution().area());
+    p_pcl_point_cloud->width = zed.getResolution().width;
+    p_pcl_point_cloud->height = zed.getResolution().height;
 
     // Create the PCL point cloud visualizer
     shared_ptr<pcl::visualization::PCLVisualizer> viewer = createRGBVisualizer(p_pcl_point_cloud);
+    viewer->addCoordinateSystem(1.0);
+    viewer->initCameraParameters();
+    viewer->setCameraPosition(0.140176, -0.188087, -3.58694, -0.0165125, -0.999615, 0.0222822);
 
     // Start ZED callback
     startZED();
