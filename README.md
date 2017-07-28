@@ -13,7 +13,7 @@ This sample shows how to acquire and display a 3D point cloud with PCL (Point Cl
 ### Prerequisites
 
 - Windows 7 64bits or later, Ubuntu 16.04
-- [ZED SDK **2.1**](https://www.stereolabs.com/developers/) and its dependencies ([CUDA](https://developer.nvidia.com/cuda-downloads))
+- [ZED SDK **2.1**](https://www.stereolabs.com/developers/) and its dependency ([CUDA](https://developer.nvidia.com/cuda-downloads))
 
 
 ## Build the program
