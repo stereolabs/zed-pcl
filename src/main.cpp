@@ -18,7 +18,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////
 
-
 /************************************************************************************
  ** This sample demonstrates how to use PCL (Point Cloud Library) with the ZED SDK **
  ************************************************************************************/
@@ -59,34 +58,34 @@ shared_ptr<pcl::visualization::PCLVisualizer> createRGBVisualizer(pcl::PointClou
 inline float convertColor(float colorIn);
 
 // Main process
+int main(int argc, char **argv){
 
-int main(int argc, char** argv) {
-
-    if (argc > 2) {
+    if (argc > 2)
+    {
         cout << "Only the path of a SVO can be passed in arg" << endl;
         return -1;
     }
 
     // Set configuration parameters
     InitParameters init_params;
-    init_params.camera_resolution = RESOLUTION_HD720;
-    if (argc == 2) init_params.svo_input_filename = argv[1];
+    init_params.camera_resolution = RESOLUTION_HD1080;
+    if (argc == 2)
+        init_params.svo_input_filename = argv[1];
     init_params.coordinate_units = UNIT_METER;
+    init_params.coordinate_system = COORDINATE_SYSTEM_RIGHT_HANDED_Y_UP;
     init_params.depth_mode = DEPTH_MODE_PERFORMANCE;
-    init_params.camera_fps = 30;
 
     // Open the camera
     ERROR_CODE err = zed.open(init_params);
     if (err != SUCCESS) {
         cout << errorCode2str(err) << endl;
+        zed.close();
         return 1;
     }
 
     // Allocate PCL point cloud at the resolution
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr p_pcl_point_cloud(new pcl::PointCloud<pcl::PointXYZRGB>);
     p_pcl_point_cloud->points.resize(zed.getResolution().area());
-    p_pcl_point_cloud->width = zed.getResolution().width;
-    p_pcl_point_cloud->height = zed.getResolution().height;
 
     // Create the PCL point cloud visualizer
     shared_ptr<pcl::visualization::PCLVisualizer> viewer = createRGBVisualizer(p_pcl_point_cloud);
@@ -134,9 +133,9 @@ int main(int argc, char** argv) {
 }
 
 /**
- *  This functions start the ZED's thread that grab images and data.
- **/
-void startZED() {
+*  This functions start the ZED's thread that grab images and data.
+**/
+void startZED(){
     // Start the thread for grabbing ZED data
     stop_signal = false;
     has_data = false;
@@ -148,11 +147,13 @@ void startZED() {
 }
 
 /**
- *  This function loops to get the point cloud from the ZED. It can be considered as a callback.
- **/
-void run() {
-    while (!stop_signal) {
-        if (zed.grab(SENSING_MODE_STANDARD) == SUCCESS) {
+*  This function loops to get the point cloud from the ZED. It can be considered as a callback.
+**/
+void run(){
+    while (!stop_signal)
+    {
+        if (zed.grab(SENSING_MODE_STANDARD) == SUCCESS)
+        {
             mutex_input.lock(); // To prevent from data corruption
             zed.retrieveMeasure(data_cloud, MEASURE_XYZRGBA);
             mutex_input.unlock();
@@ -163,9 +164,9 @@ void run() {
 }
 
 /**
- *  This function frees and close the ZED, its callback(thread) and the viewer
- **/
-void closeZED() {
+*  This function frees and close the ZED, its callback(thread) and the viewer
+**/
+void closeZED(){
     // Stop the thread
     stop_signal = true;
     zed_callback.join();
@@ -173,9 +174,9 @@ void closeZED() {
 }
 
 /**
- *  This function creates a PCL visualizer
- **/
-shared_ptr<pcl::visualization::PCLVisualizer> createRGBVisualizer(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud) {
+*  This function creates a PCL visualizer
+**/
+shared_ptr<pcl::visualization::PCLVisualizer> createRGBVisualizer(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud){
     // Open 3D viewer and add point cloud
     shared_ptr<pcl::visualization::PCLVisualizer> viewer(new pcl::visualization::PCLVisualizer("PCL ZED 3D Viewer"));
     viewer->setBackgroundColor(0.12, 0.12, 0.12);
@@ -184,16 +185,15 @@ shared_ptr<pcl::visualization::PCLVisualizer> createRGBVisualizer(pcl::PointClou
     viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1.5);
     viewer->addCoordinateSystem(1.0);
     viewer->initCameraParameters();
-    viewer->setCameraPosition(0.140176, -0.188087, -3.58694, -0.0165125, -0.999615, 0.0222822);
     return (viewer);
 }
 
 /**
- *  This function convert a RGBA color packed into a packed RGBA PCL compatible format
- **/
-inline float convertColor(float colorIn) {
-    uint32_t color_uint = *(uint32_t*) & colorIn;
-    unsigned char* color_uchar = (unsigned char*) &color_uint;
-    color_uint = ((uint32_t) color_uchar[0] << 16 | (uint32_t) color_uchar[1] << 8 | (uint32_t) color_uchar[2]);
-    return *reinterpret_cast<float*> (&color_uint);
+*  This function convert a RGBA color packed into a packed RGBA PCL compatible format
+**/
+inline float convertColor(float colorIn){
+    uint32_t color_uint = *(uint32_t *)&colorIn;
+    unsigned char *color_uchar = (unsigned char *)&color_uint;
+    color_uint = ((uint32_t)color_uchar[0] << 16 | (uint32_t)color_uchar[1] << 8 | (uint32_t)color_uchar[2]);
+    return *reinterpret_cast<float *>(&color_uint);
 }

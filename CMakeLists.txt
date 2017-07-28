@@ -9,7 +9,6 @@ endif(COMMAND cmake_policy)
 
 SET(EXECUTABLE_OUTPUT_PATH ".")
 
-SET(VERSION_REQ_OCV "3.1")
 SET(VERSION_REQ_CUDA "8.0")
 
 IF(WIN32) # Windows
@@ -18,12 +17,11 @@ IF(WIN32) # Windows
     SET(ZED_LIBRARY_DIR $ENV{ZED_LIBRARY_DIR})
     SET(OPENCV_DIR $ENV{OPENCV_DIR})
 ELSE() # Linux
-    find_package(ZED 2.0 REQUIRED)
+    find_package(ZED 2 REQUIRED)
   
     ##For Jetson, OpenCV4Tegra is based on OpenCV2.4
     exec_program(uname ARGS -p OUTPUT_VARIABLE CMAKE_SYSTEM_NAME2)
     if ( CMAKE_SYSTEM_NAME2 MATCHES "aarch64" OR CMAKE_SYSTEM_NAME2 MATCHES "armv7l" )
-       SET(VERSION_REQ_OCV "2.4")
        SET(VERSION_REQ_CUDA "")
 
 
@@ -37,7 +35,7 @@ ELSE() # Linux
 ENDIF(WIN32)
 
 
-find_package(OpenCV ${VERSION_REQ_OCV} COMPONENTS core highgui imgproc REQUIRED)
+find_package(OpenCV COMPONENTS core highgui imgproc REQUIRED)
 find_package(CUDA ${VERSION_REQ_CUDA} REQUIRED)
 find_package(PCL)
 

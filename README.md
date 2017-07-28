@@ -1,6 +1,6 @@
 # Stereolabs ZED - PCL
 
-This sample shows how to interface the ZED SDK and PCL (Point Cloud Library) to acquire and display a 3D point cloud from the ZED.
+This sample shows how to acquire and display a 3D point cloud with PCL (Point Cloud Library).
 
 
 ## Getting started
@@ -47,15 +47,8 @@ Open a terminal in the sample directory and execute the following command:
 You can optionally provide an SVO file path (recorded stereo video of the ZED)
 
 
-## Features
-
-The ZED SDK outputs a 4-channel float matrix containing the XYZRGB point cloud. This color point cloud is converted to PCL format and then displayed using `PCLVisualizer`.
-
-
-
 ### Troubleshooting
- - PCL view can be zoomed in at launch, displaying only green and red colors. To adjust the viewport, simply zoom out using your mouse wheel or keyboard shortcuts.
+ - PCL view can start zoomed in, displaying only green and red colors. To adjust the viewport, simply zoom out using your mouse wheel or keyboard shortcuts.
 
 ### Limitations
-
 - The point cloud conversion to PCL format is time consuming and will affect application running time.
