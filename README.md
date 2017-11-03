@@ -6,7 +6,7 @@ This sample shows how to acquire and display a 3D point cloud with PCL (Point Cl
 ## Getting started
 
 - First, download the latest version of the ZED SDK on [stereolabs.com](https://www.stereolabs.com).
-- Make sure you have [PCL](https://github.com/PointCloudLibrary/pcl) installed with its visualization module.
+- Make sure you have [PCL](https://github.com/PointCloudLibrary/pcl/releases) installed with its visualization module.
 - For more information, read the ZED [API documentation](https://www.stereolabs.com/developers/documentation/API/).
 
 
@@ -14,7 +14,6 @@ This sample shows how to acquire and display a 3D point cloud with PCL (Point Cl
 
 - Windows 7 64bits or later, Ubuntu 16.04
 - [ZED SDK **2.1**](https://www.stereolabs.com/developers/) and its dependency ([CUDA](https://developer.nvidia.com/cuda-downloads))
-
 
 ## Build the program
 
