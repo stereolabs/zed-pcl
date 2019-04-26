@@ -17,7 +17,7 @@ This sample shows how to acquire and display a 3D point cloud with PCL (Point Cl
 
 ## Build the program
 
-Download the sample and follow these instructions:
+Download the sample and follow the instructions below: [More](https://www.stereolabs.com/docs/getting-started/application-development/)
 
 #### Build for Windows
 
