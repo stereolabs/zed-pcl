@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////
 //
-// Copyright (c) 2018, STEREOLABS.
+// Copyright (c) 2020, STEREOLABS.
 //
 // All rights reserved.
 //
@@ -23,7 +23,7 @@
  ************************************************************************************/
 
 // ZED includes
-#include <sl_zed/Camera.hpp>
+#include <sl/Camera.hpp>
 
 // PCL includes
 // Undef on Win32 min/max for PCL
@@ -57,6 +57,8 @@ void closeZED();
 shared_ptr<pcl::visualization::PCLVisualizer> createRGBVisualizer(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud);
 inline float convertColor(float colorIn);
 
+sl::Resolution cloud_res;
+
 // Main process
 
 int main(int argc, char **argv) {
@@ -69,26 +71,28 @@ int main(int argc, char **argv) {
     // Set configuration parameters
     InitParameters init_params;
     if (argc == 2)
-        init_params.svo_input_filename = argv[1];
+        init_params.input.setFromSVOFile(argv[1]);
     else {
-        init_params.camera_resolution = RESOLUTION_VGA;
+        init_params.camera_resolution = RESOLUTION::HD720;
         init_params.camera_fps = 30;
     }
-    init_params.coordinate_units = UNIT_METER;
-    init_params.coordinate_system = COORDINATE_SYSTEM_RIGHT_HANDED_Y_UP;
-    init_params.depth_mode = DEPTH_MODE_PERFORMANCE;
+    init_params.coordinate_units = UNIT::METER;
+    init_params.coordinate_system = COORDINATE_SYSTEM::RIGHT_HANDED_Y_UP;
+    init_params.depth_mode = DEPTH_MODE::ULTRA;
 
     // Open the camera
     ERROR_CODE err = zed.open(init_params);
-    if (err != SUCCESS) {
+    if (err != ERROR_CODE::SUCCESS) {
         cout << toString(err) << endl;
         zed.close();
         return 1;
     }
 
+    cloud_res = sl::Resolution(640, 360);
+
     // Allocate PCL point cloud at the resolution
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr p_pcl_point_cloud(new pcl::PointCloud<pcl::PointXYZRGB>);
-    p_pcl_point_cloud->points.resize(zed.getResolution().area());
+    p_pcl_point_cloud->points.resize(cloud_res.area());
 
     // Create the PCL point cloud visualizer
     shared_ptr<pcl::visualization::PCLVisualizer> viewer = createRGBVisualizer(p_pcl_point_cloud);
@@ -154,9 +158,9 @@ void startZED() {
  **/
 void run() {
     while (!stop_signal) {
-        if (zed.grab(SENSING_MODE_STANDARD) == SUCCESS) {
+        if (zed.grab(SENSING_MODE::STANDARD) == ERROR_CODE::SUCCESS) {
             mutex_input.lock(); // To prevent from data corruption
-            zed.retrieveMeasure(data_cloud, MEASURE_XYZRGBA);
+            zed.retrieveMeasure(data_cloud, MEASURE::XYZRGBA, MEM::CPU, cloud_res);
             mutex_input.unlock();
             has_data = true;
         } else
