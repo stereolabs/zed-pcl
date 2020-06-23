@@ -19,6 +19,11 @@ find_package(ZED 3 REQUIRED)
 find_package(CUDA ${ZED_CUDA_VERSION} EXACT REQUIRED)
 find_package(PCL REQUIRED)
 
+IF(NOT WIN32)
+    SET(SPECIAL_OS_LIBS "pthread" "X11")
+    add_definitions(-Wno-write-strings -fpermissive)
+ENDIF()
+
 if(PCL_FOUND)
     include_directories(${CUDA_INCLUDE_DIRS})
     include_directories(${PCL_INCLUDE_DIRS})
@@ -42,6 +47,7 @@ if(PCL_FOUND)
     endif()
     
     TARGET_LINK_LIBRARIES(${execName} 
+                            ${SPECIAL_OS_LIBS} 
                             ${ZED_LIBS} 
                             ${OpenCV_LIBRARIES} 
                             ${PCL_LIBRARIES})                            

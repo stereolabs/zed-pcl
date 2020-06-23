@@ -100,11 +100,15 @@ int main(int argc, char **argv) {
     // Start ZED callback
     startZED();
 
+    // Set Viewer initial position
+    viewer->setCameraPosition(0, 0, 5,    0, 0, 1,   0, 1, 0);
+    viewer->setCameraClipDistances(0.1,1000);
+
     // Loop until viewer catches the stop signal
     while (!viewer->wasStopped()) {
 
-        // Try to lock the data if possible (not in use). Otherwise, do nothing.
-        if (mutex_input.try_lock()) {
+            //Lock to use the point cloud
+            mutex_input.lock();
             float *p_data_cloud = data_cloud.getPtr<float>();
             int index = 0;
 
@@ -126,8 +130,6 @@ int main(int argc, char **argv) {
             mutex_input.unlock();
             viewer->updatePointCloud(p_pcl_point_cloud);
             viewer->spinOnce(10);
-        } else
-            sleep_ms(1);
     }
 
     // Close the viewer
