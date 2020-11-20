@@ -7,8 +7,7 @@ This sample shows how to acquire and display a 3D point cloud with PCL (Point Cl
 
 - First, download the latest version of the ZED SDK on [stereolabs.com](https://www.stereolabs.com).
 - Make sure you have [PCL](https://github.com/PointCloudLibrary/pcl/releases) installed with its visualization module.
-- For more information, read the ZED [API documentation](https://www.stereolabs.com/developers/documentation/API/).
-
+- For more information, read the ZED [Documentation](https://www.stereolabs.com/docs/) and [API documentation](https://www.stereolabs.com/docs/api/) or our [Community page](https://community.stereolabs.com)
 
 ### Prerequisites
 
@@ -51,3 +50,6 @@ You can optionally provide an SVO file path (recorded stereo video of the ZED)
 
 ### Limitations
 - The point cloud conversion to PCL format is time consuming and will affect application running time.
+
+## Support
+If you need assistance go to our Community site at https://community.stereolabs.com/
