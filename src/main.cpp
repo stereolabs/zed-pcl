@@ -160,7 +160,7 @@ void startZED() {
  **/
 void run() {
     while (!stop_signal) {
-        if (zed.grab(SENSING_MODE::STANDARD) == ERROR_CODE::SUCCESS) {
+        if (zed.grab() == ERROR_CODE::SUCCESS) {
             mutex_input.lock(); // To prevent from data corruption
             zed.retrieveMeasure(data_cloud, MEASURE::XYZRGBA, MEM::CPU, cloud_res);
             mutex_input.unlock();
